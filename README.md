@@ -2,7 +2,7 @@
 
 # ChatWheel for V Rising
 
-ChatWheel is a server-side modification for V Rising that transforms the emote wheel into a fully functional communication wheel.
+ChatWheel is a server-side modification for V Rising that transforms the emote wheel into a fully functional chat wheel.
 
 It supports chat commands and dynamic placeholders that provide precise information such as cooldowns, debuff timers, and player locations in real time. By reducing language barriers and improving clarity of communication, ChatWheel enables teams to coordinate more effectively and perform at a higher competitive level.
 
