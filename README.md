@@ -58,10 +58,8 @@ Feel free to contact me on Discord (nova_nova) if you have any questions or need
 ## Installation
 
 1. Install BepInEx, which is required for modding VRising. Follow the instructions provided at [BepInEx Installation Guide](https://wiki.vrisingmods.com/user/bepinex_install.html) to set it up correctly in your VRising game directory.
-   - **Note:** Until BepInEx is updated for 1.1, please do not use the thunderstore version. Get the correct testing version https://wiki.vrisingmods.com/user/game_update.html.
 
 2. Download the ChatWheel mod along with its dependency (VCF). Ensure you select the correct versions that are compatible with your game.
-   - **Note:** Again, until dependencies are updated for 1.1, please do not use the thunderstore version. Get the correct testing version https://wiki.vrisingmods.com/user/game_update.html.
 
 3. After downloading, locate the .dll files for ChatWheel and its dependency. Move or copy these .dll files into the `BepInEx\Plugins` directory within your VRising installation folder.
    - **Single Player Note:**
