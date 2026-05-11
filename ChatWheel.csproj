@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<AssemblyName>ChatWheel</AssemblyName>
+		<Description>Use emote wheel as a chat wheel</Description>
+		<Version>1.0.0</Version>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latest</LangVersion>
+		<RootNamespace>ChatWheel</RootNamespace>
+		<BepInExPluginGuid>casanova.nova.ChatWheel</BepInExPluginGuid>
+		<BaseOutputPath></BaseOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+    	<PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.733" IncludeAssets="compile" />
+		<PackageReference Include="VRising.Unhollowed.Client" Version="1.1.8.9179701" />
+    	<PackageReference Include="VRising.VampireCommandFramework" Version="0.10.*" />
+  	</ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="copy &quot;$(TargetPath)&quot; &quot;D:\SteamLibrary\steamapps\common\VRisingDedicatedServer\BepInEx\plugins&quot; " ContinueOnError="true" />
+	</Target>
+</Project>
