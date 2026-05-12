@@ -101,7 +101,7 @@ class ChatWheelCommands
 		if (count > 0)
 		{
 			Database.SaveChatWheel();
-			ctx.Reply($"Cleared {count} messages.");
+			ctx.Reply($"Cleared {count} message(s).");
 		}
 		else
 		{

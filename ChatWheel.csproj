@@ -3,7 +3,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<AssemblyName>ChatWheel</AssemblyName>
 		<Description>Use emote wheel as a chat wheel</Description>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<RootNamespace>ChatWheel</RootNamespace>

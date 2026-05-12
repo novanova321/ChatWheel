@@ -8,6 +8,8 @@ It supports chat commands and dynamic placeholders that provide precise informat
 
 Feel free to contact me on Discord (nova_nova) if you have any questions or need assistance with the mod.
 
+Watch video here: https://www.youtube.com/watch?v=SIQk_3QC4V8
+
 ## Player Commands
 
 - `.cw bind (scope) (message)`
