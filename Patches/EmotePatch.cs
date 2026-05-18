@@ -61,9 +61,7 @@ public static class EmoteSystemPatch
 				}
 				else if (Database.CHATWHEEL.TryGetValue(key, out var cw) && Database.IsChatWheelEnabled(platformId))
 				{
-					var networkId = userEntity.Read<NetworkId>();
 					var clanEntity = user.ClanEntity.GetEntityOnServer();
-					var networkId2 = charEntity.Read<NetworkId>();
 
 					bool hasCombatTimer = cw.message.Contains("$combatTimer", StringComparison.OrdinalIgnoreCase);
 					bool hasBaneTimer = cw.message.Contains("$baneTimer", StringComparison.OrdinalIgnoreCase);
@@ -131,12 +129,11 @@ public static class EmoteSystemPatch
 							{
 								var owner = userOwner.Owner.GetEntityOnServer();
 								if (!owner.Equals(Entity.Null) && owner.Exists() && owner.TryRead<User>(out var castleUserOwner))
-									location = $"{castleUserOwner.CharacterName.ToString()}'s castle in ";
+									location = $"{castleUserOwner.CharacterName}'s castle in ";
 								break;
 							}
 						}
 
-						// sdfa
 						var zone = userEntity.Read<CurrentMapZone>();
 						string terrainChunkString = zone.TerrainChunk.ToString();
 
@@ -147,6 +144,7 @@ public static class EmoteSystemPatch
 						}
 						else
 						{
+							// probably better to cache the result of this
 							var query = Core.EntityManager.CreateEntityQuery(new EntityQueryDesc
 							{
 								All = new ComponentType[]
@@ -208,8 +206,10 @@ public static class EmoteSystemPatch
 						.Replace("$deathTimer", deathTimer, StringComparison.OrdinalIgnoreCase)
 						.Replace("$location", location, StringComparison.OrdinalIgnoreCase)
 						.Replace("$ultCd", ultCd, StringComparison.OrdinalIgnoreCase);
+
 					Core.EntityManager.DestroyEntity(entity);
 
+					// handle commands
 					if (cw.message[0] == '.')
 					{
 						var messageEvent = new ChatMessageEvent()
@@ -224,20 +224,10 @@ public static class EmoteSystemPatch
 						continue;
 					}
 
-					var scope = cw.scope == "clan" ? ServerChatMessageType.Team : ServerChatMessageType.Local;
-					var chatMessageType = scope == ServerChatMessageType.Team ? ChatMessageType.Team : ChatMessageType.Local;
+					var serverChatMessageType = cw.scope == "clan" ? ServerChatMessageType.Team : ServerChatMessageType.Local;
+					var chatMessageType = serverChatMessageType == ServerChatMessageType.Team ? ChatMessageType.Team : ChatMessageType.Local;
 
-					// for clan chat
-					if (scope == ServerChatMessageType.Team)
-					{
-						if (!clanEntity.Exists() || clanEntity.Equals(Entity.Null))
-						{
-							Helper.SendSystemMessageToClient(user, $"ChatWheel: You don't have a clan.");
-							continue;
-						}
-					}
-
-					Helper.SendMessageFromPlayerWithType(fromCharacter, msg, chatMessageType, scope);
+					Helper.SendMessageFromPlayerWithType(fromCharacter, msg, chatMessageType, serverChatMessageType);
 				}
 			}
 		}
