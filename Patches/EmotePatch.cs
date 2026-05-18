@@ -75,43 +75,33 @@ public static class EmoteSystemPatch
 					string location = "";
 					string ultCd = "N/A";
 
-					if (hasCombatTimer || hasBaneTimer)
+					if (hasCombatTimer && BuffUtility.TryGetBuff(Core.EntityManager, charEntity, Buff_InCombat_PvPVampire, out var pvpCombatBuff))
 					{
-						var buffEntities = Helper.GetEntitiesByComponentTypes<Buff, PrefabGUID>();
+						var age = pvpCombatBuff.Read<Age>();
+						var lifeTime = pvpCombatBuff.Read<LifeTime>();
+						combatTimer = Convert.ToInt32(lifeTime.Duration - age.Value) + "s";
+					}
 
-						foreach (var buffEntity in buffEntities)
+					if ((hasBaneTimer || hasDeathTimer) && BuffUtility.TryGetBuff(Core.EntityManager, charEntity, Buff_General_VampirePvPDeathDebuff, out var baneBuff))
+					{
+						if (hasBaneTimer)
 						{
-							if (buffEntity.Read<EntityOwner>().Owner == charEntity)
-							{
-								var buffGuidHash = buffEntity.Read<PrefabGUID>().GuidHash;
-								if (hasCombatTimer && buffGuidHash.Equals(Buff_InCombat_PvPVampire.GuidHash))
-								{
-									var age = buffEntity.Read<Age>();
-									var lifeTime = buffEntity.Read<LifeTime>();
-									combatTimer = Convert.ToInt32(lifeTime.Duration - age.Value) + "s";
-								}
-								else if ((hasBaneTimer || hasDeathTimer) && buffGuidHash.Equals(Buff_General_VampirePvPDeathDebuff.GuidHash))
-								{
-									if (hasBaneTimer)
-									{
-										var age = buffEntity.Read<Age>();
-										var lifeTime = buffEntity.Read<LifeTime>();
-										int totalSeconds = Convert.ToInt32(lifeTime.Duration - age.Value);
-										int minutes = totalSeconds / 60;
-										int seconds = totalSeconds % 60;
-										baneTimer = "";
-										if (minutes > 0)
-											baneTimer += $"{minutes}m";
-										if (seconds > 0)
-											baneTimer += $"{seconds}s";
-									}
-									if (hasDeathTimer)
-									{
-										var buff = buffEntity.Read<Buff>();
-										deathTimer = Math.Min(150, 30 + (buff.Stacks * 60)) + "s";
-									}
-								}
-							}
+							var age = baneBuff.Read<Age>();
+							var lifeTime = baneBuff.Read<LifeTime>();
+							int totalSeconds = Convert.ToInt32(lifeTime.Duration - age.Value);
+							int minutes = totalSeconds / 60;
+							int seconds = totalSeconds % 60;
+							baneTimer = "";
+							if (minutes > 0)
+								baneTimer += $"{minutes}m";
+							if (seconds > 0)
+								baneTimer += $"{seconds}s";
+						}
+
+						if (hasDeathTimer)
+						{
+							var buff = baneBuff.Read<Buff>();
+							deathTimer = Math.Min(150, 30 + (buff.Stacks * 60)) + "s";
 						}
 					}
 
