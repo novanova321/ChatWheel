@@ -5,8 +5,6 @@ using Unity.Collections;
 using System;
 using ChatWheel.Commands;
 using Unity.Entities;
-using UnityEngine;
-using Unity.Transforms;
 using ChatWheel.Models;
 using Stunlock.Core;
 using ProjectM.Terrain;
@@ -205,13 +203,11 @@ public static class EmoteSystemPatch
 						}
 					}
 
-					var msg = new FixedString512Bytes(
-						cw.message.Replace("$combatTimer", combatTimer, StringComparison.OrdinalIgnoreCase)
+					var msg = cw.message.Replace("$combatTimer", combatTimer, StringComparison.OrdinalIgnoreCase)
 						.Replace("$baneTimer", baneTimer, StringComparison.OrdinalIgnoreCase)
 						.Replace("$deathTimer", deathTimer, StringComparison.OrdinalIgnoreCase)
 						.Replace("$location", location, StringComparison.OrdinalIgnoreCase)
-						.Replace("$ultCd", ultCd, StringComparison.OrdinalIgnoreCase)
-					);
+						.Replace("$ultCd", ultCd, StringComparison.OrdinalIgnoreCase);
 					Core.EntityManager.DestroyEntity(entity);
 
 					if (cw.message[0] == '.')
@@ -228,7 +224,8 @@ public static class EmoteSystemPatch
 						continue;
 					}
 
-					var scope = cw.scope == "global" ? ServerChatMessageType.Global : (cw.scope == "clan" ? ServerChatMessageType.Team : ServerChatMessageType.Local);
+					var scope = cw.scope == "clan" ? ServerChatMessageType.Team : ServerChatMessageType.Local;
+					var chatMessageType = scope == ServerChatMessageType.Team ? ChatMessageType.Team : ChatMessageType.Local;
 
 					// for clan chat
 					if (scope == ServerChatMessageType.Team)
@@ -238,44 +235,9 @@ public static class EmoteSystemPatch
 							Helper.SendSystemMessageToClient(user, $"ChatWheel: You don't have a clan.");
 							continue;
 						}
-
-						var userBuffer = Core.EntityManager.GetBuffer<SyncToUserBuffer>(clanEntity);
-
-						for (var i = 0; i < userBuffer.Length; ++i)
-						{
-							var userBufferEntry = userBuffer[i];
-							var memberUserEntity = userBufferEntry.UserEntity;
-
-							if (memberUserEntity.TryRead<ConnectedUser>(out var connectedUser))
-							{
-								int idx = connectedUser.UserIndex;
-								ServerChatUtils.SendChatMessage(Core.EntityManager, ref idx, ref msg, ref networkId, ref networkId2, scope, DateTime.UtcNow.Ticks);
-							}
-						}
 					}
 
-					// for local and global chats
-					else
-					{
-						var playerEntities = Helper.GetEntitiesByComponentType<PlayerCharacter>();
-						foreach (var playerEntity in playerEntities)
-						{
-							var userEnt = playerEntity.Read<PlayerCharacter>().UserEntity;
-
-							if (userEnt.TryRead<ConnectedUser>(out var connectedUser))
-							{
-								if (scope == ServerChatMessageType.Local)
-								{
-									var senderPos = charEntity.Read<LocalToWorld>().Position;
-									var pos = playerEntity.Read<LocalToWorld>().Position;
-									if (Vector3.Distance(senderPos, pos) > 40) continue;
-								}
-
-								int idx = connectedUser.UserIndex;
-								ServerChatUtils.SendChatMessage(Core.EntityManager, ref idx, ref msg, ref networkId, ref networkId2, scope, DateTime.UtcNow.Ticks);
-							}
-						}
-					}
+					Helper.SendMessageFromPlayerWithType(fromCharacter, msg, chatMessageType, scope);
 				}
 			}
 		}

@@ -4,7 +4,7 @@ using ProjectM.Network;
 using Unity.Collections;
 using Unity.Entities;
 using System.Runtime.InteropServices;
-using Stunlock.Core;
+using System;
 
 namespace ChatWheel;
 
@@ -103,5 +103,31 @@ internal static partial class Helper
 	{
 		AddComponent<T>(entity);
 		SetComponentData(entity, componentData);
+	}
+
+	public static void SendMessageFromPlayerWithType(FromCharacter fromCharacter, string message, ChatMessageType _chatMessageType, ServerChatMessageType _serverChatMessageType)
+	{
+		FixedString512Bytes msg = new FixedString512Bytes(message);
+		Entity charEntity = fromCharacter.Character;
+		Entity userEntity = fromCharacter.User;
+		NetworkId userNetworkId = userEntity.Read<NetworkId>();
+		NetworkId characterNetworkId = charEntity.Read<NetworkId>();
+		ConnectedUser connectedUser = userEntity.Read<ConnectedUser>();
+
+		int userIndex = connectedUser.UserIndex;
+
+		ServerChatUtils.SendChatMessage(Core.Server.EntityManager, ref userIndex, ref msg, ref userNetworkId, ref characterNetworkId, _serverChatMessageType, DateTime.UtcNow.Ticks);
+
+		Entity messageEntity = Core.EntityManager.CreateEntity(
+			Unity.Entities.ComponentType.ReadWrite<FromCharacter>(),
+			Unity.Entities.ComponentType.ReadWrite<ChatMessageEvent>()
+		);
+
+		messageEntity.Write(fromCharacter);
+		messageEntity.Write(new ChatMessageEvent
+		{
+			MessageType = _chatMessageType,
+			MessageText = new FixedString512Bytes(message),
+		});
 	}
 }
